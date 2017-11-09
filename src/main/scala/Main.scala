@@ -23,12 +23,20 @@ object Matcher {
     if (window <= 0)
       Seq(Match(None, Some(words)))
     else {
-      val initial = (Seq(), Accumulator.empty)
-      val reduced = words.foldLeft (initial) { case ((matches, accumulator), word) => ??? }
+      val initial = (Seq(), Accumulator.empty): (Seq[Match], Accumulator)
+      val reduced = words.foldLeft (initial) { case ((matches, accumulator), word) => {
+        val next = accumulator accumulate word
 
-      reduced match {
+        next convert window map { m => (matches :+ m, Accumulator.empty) } getOrElse ((matches, next))
+      } }
+
+      val matches = reduced match {
         case (matches, accumulator) => matches :+ Match.from(Seq(), accumulator.words)
       }
+      matches flatMap { _ match {
+        case m@Match(_, Some(remainder)) => m +: toWords(remainder, window - 1)
+        case m => Seq(m)
+      } }
     }
 
 }
