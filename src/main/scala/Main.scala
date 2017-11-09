@@ -34,7 +34,7 @@ object Matcher {
         case (matches, accumulator) => matches :+ Match.from(Seq(), accumulator.words)
       }
       matches flatMap { _ match {
-        case m@Match(_, Some(remainder)) => m +: toWords(remainder, window - 1)
+        case m@Match(_, Some(remainder)) => toWords(remainder, window - 1) :+ m
         case m => Seq(m)
       } }
     }

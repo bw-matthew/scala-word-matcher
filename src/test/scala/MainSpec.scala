@@ -44,4 +44,11 @@ class MatcherSpec extends FlatSpec with Matchers {
 
     Matcher toPhrases phrase shouldEqual Seq("trump is president")
   }
+
+  "The Matcher" should "return phrases in the order they appear" in {
+    implicit val corpus = Corpus(Seq("donald trump", "trump is president"))
+    val phrase = "donald trump likes to remind everyone that trump is president"
+
+    Matcher toPhrases phrase shouldEqual Seq("donald trump", "trump is president")
+  }
 }
