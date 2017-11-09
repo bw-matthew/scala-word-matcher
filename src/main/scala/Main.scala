@@ -35,7 +35,9 @@ private sealed case class Accumulator(words: Seq[String]) {
     if (words.length < window)
       return None
     else
-      toMatch(window) filter { corpus.matches(_.phrase) }
+      toMatch(window) filter {
+        case Match(phrase, _) => phrase map { corpus.matches(_) } getOrElse(false)
+      }
 
   private def toMatch(window: Int): Option[Match] =
     if (words.length < window)
