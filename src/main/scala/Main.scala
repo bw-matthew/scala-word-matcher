@@ -34,18 +34,32 @@ private sealed case class Accumulator(words: Seq[String]) {
   def convert(window: Int)(implicit corpus: Corpus): Option[Match] =
     if (words.length < window)
       return None
+    else
+      toMatch(window) filter { corpus.matches(_.phrase) }
+
+  private def toMatch(window: Int): Option[Match] =
+    if (words.length < window)
+      return None
     else {
-      val phrase = words slice(words.length - window, words.length) // you've tested everything but this window
-
-      if (! corpus.matches(phrase))
-        return None
-
-      if (words.length > window)
-        Some(Match(Some(phrase), Some(words slice(0, words.length - window))))
-      else
-        Some(Match(Some(phrase), None))
+      val offset = words.length - window
+      val phrase = words slice(offset, words.length)
+      val remainder = words slice(0, offset)
+      Some(Match.from(phrase, remainder))
     }
 
 }
 
 private sealed case class Match(phrase: Option[Seq[String]], remainder: Option[Seq[String]])
+
+private object Match {
+
+  def from(phrase: Seq[String], remainder: Seq[String]): Match =
+    Match(noneIfEmpty(phrase), noneIfEmpty(remainder))
+
+  private def noneIfEmpty[T](value: Seq[T]): Option[Seq[T]] =
+    if (value.isEmpty)
+      None
+    else
+      Some(value)
+
+}
