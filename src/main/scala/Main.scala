@@ -22,8 +22,15 @@ object Matcher {
   private def toWords(words: Seq[String], window: Int)(implicit corpus: Corpus): Seq[Match] =
     if (window <= 0)
       Seq(Match(None, Some(words)))
-    else
-      Seq()
+    else {
+      val initial = (Seq(), Accumulator.empty)
+      val reduced = words.foldLeft (initial) { case ((matches, accumulator), word) => ??? }
+
+      reduced match {
+        case (matches, accumulator) => matches :+ Match.from(Seq(), accumulator.words)
+      }
+    }
+
 }
 
 private sealed case class Accumulator(words: Seq[String]) {
@@ -48,6 +55,12 @@ private sealed case class Accumulator(words: Seq[String]) {
       val remainder = words slice(0, offset)
       Some(Match.from(phrase, remainder))
     }
+
+}
+
+private object Accumulator {
+
+  def empty: Accumulator = Accumulator(Seq())
 
 }
 
